@@ -1,6 +1,6 @@
 using NLog;
 using TodoList.Extensions;
-using TodoList.Repositoy;
+using TodoList.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,9 +9,9 @@ LogManager.Setup().LoadConfigurationFromFile(string.Concat(Directory.GetCurrentD
 
 // Add services to the container.
 builder.Services.ConfigureMysqlContext(builder.Configuration);
-builder.Services.AddScoped<TodoItemRepository>();
+builder.Services.ConfigureTodoItemRepository();
 builder.Services.ConfigureLoggerService();
-
+builder.Services.ConfigureUserRepository();
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
