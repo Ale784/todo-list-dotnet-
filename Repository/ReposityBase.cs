@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TodoList.Contracts;
 using TodoList.models.context;
 
-namespace TodoList.Repositoy;
+namespace TodoList.Repository;
 
 public abstract class RepositoryBase<T, TContext> 
     : IRespository<T> where T : class
@@ -15,9 +15,10 @@ public abstract class RepositoryBase<T, TContext>
         this.context = context;
     }
 
-    public Task<T> Create(T entity)
+    public async Task Create(T entity)
     {
-        throw new NotImplementedException();
+        context.Set<T>().Add(entity);
+        await context.SaveChangesAsync();
     }
 
     public IQueryable<T> FindAll(bool trackChanges)
