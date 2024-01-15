@@ -1,0 +1,6 @@
+
+### get task by condition
+GET http://localhost:5250/item/596767dc-c295-4dc9-ae79-4e80796f51db
+
+### get all the tasks
+GET http://localhost:5250/item/list
