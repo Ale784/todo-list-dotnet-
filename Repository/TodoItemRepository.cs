@@ -1,7 +1,8 @@
+using TodoList.DTO;
 using TodoList.models;
 using TodoList.models.context;
 
-namespace TodoList.Repositoy;
+namespace TodoList.Repository;
 
 public class TodoItemRepository : RepositoryBase<TodoItem, TodoDbContext>
 {
