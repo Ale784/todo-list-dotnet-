@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TodoList.Contracts;
@@ -18,14 +19,17 @@ public class TodoItemController : ControllerBase
 
     private readonly TodoItemRepository _todoItemRepository;
     private readonly UserRepository _userRepository;
-
     private readonly ILoggerManager _logger;
 
-    public TodoItemController(TodoItemRepository todoItemRepository, ILoggerManager logger, UserRepository userRepository)
+    private readonly IMapper _mapper;
+
+    public TodoItemController(TodoItemRepository todoItemRepository, ILoggerManager logger, UserRepository userRepository,
+    IMapper mapper)
     {
         _logger = logger;
         _todoItemRepository = todoItemRepository;
         _userRepository = userRepository;
+        _mapper = mapper;
     }
 
     [HttpPost]
@@ -69,7 +73,9 @@ public class TodoItemController : ControllerBase
         item.User = current;
         await _todoItemRepository.Create(item);
 
+
         _logger.LogDebug($"TodoItemDTO created - Name: {item.Name}, Description: {item.Description}, IsCompleted: {item.IsCompleted}");
+
         return TypedResults.Created($"/item/{item.Id}");
     }
 
@@ -84,10 +90,12 @@ public class TodoItemController : ControllerBase
 
         _logger.LogInfo($"Found {result.Count} items.");
 
+        var todoDTO = _mapper.Map<IEnumerable<TodoItemDTO>>(result);
+
         return TypedResults.Ok(new
         {
             success = true,
-            data = result,
+            data = todoDTO,
         });
 
     }
