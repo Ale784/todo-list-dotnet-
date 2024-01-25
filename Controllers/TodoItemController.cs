@@ -6,6 +6,7 @@ using TodoList.DTO;
 using TodoList.LoggerService;
 using TodoList.models;
 using TodoList.models.context;
+using TodoList.models.Exceptions;
 using TodoList.Repository;
 
 namespace TodoList.Controllers;
@@ -58,7 +59,7 @@ public class TodoItemController : ControllerBase
 
         _logger.LogDebug("Attempting to retrieve current user from the repository");
 
-        var current = _userRepository.FindByCondition(x => x.Id == Guid.Parse("596767dc-c295-4dc9-ae79-4e80796f51db"), true).FirstOrDefault();
+        var current = _userRepository.FindByCondition(x => x.Id.Equals(Guid.Parse("596767dc-c295-4dc9-ae79-4e80796f51db")), true).FirstOrDefault();
 
         if (current is null)
         {
@@ -70,7 +71,6 @@ public class TodoItemController : ControllerBase
         item.CreatedOn = DateTime.UtcNow;
         item.LastModified = DateTime.UtcNow;
         item.UserId = current.Id;
-        item.User = current;
         await _todoItemRepository.Create(item);
 
 
@@ -82,6 +82,7 @@ public class TodoItemController : ControllerBase
     [HttpGet("list")]
     public async Task<IResult> FindAll([FromQuery] ItemParameter itemParameter)
     {
+        
         _logger.LogInfo("In findAll method");
 
         var items = _todoItemRepository.FindAll(false);
@@ -99,4 +100,28 @@ public class TodoItemController : ControllerBase
         });
 
     }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IResult> FindByCondition(Guid id)
+    {
+        var todo = _todoItemRepository.FindByCondition(x => x.Id == id, trackChanges: false).FirstOrDefault();
+        
+        if(todo is null)
+        {
+            _logger.LogWarn($"Todo with id: {id} not be found");
+            throw new CompanyNotFoundException(id);
+        }
+
+        return TypedResults.Ok(todo);
+    }
 }
+
+
+
+
+
+
+
+
+
+
