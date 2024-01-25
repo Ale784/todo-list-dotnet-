@@ -1,6 +1,6 @@
 using NLog;
+using TodoList.Contracts;
 using TodoList.Extensions;
-using TodoList.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +20,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+//Extract the logger service
+var logger = app.Services.GetRequiredService<ILoggerManager>();
+// Configure global exception handling
+// Pass the logger service to the extension method
+app.ConfigureExceptionHandler(logger);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
