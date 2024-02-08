@@ -34,7 +34,7 @@ public class TodoItemController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IResult> CreateItem([FromBody] TodoItemDTO data)
+    public async Task<IResult> CreateItem([FromBody] TodoItemForCreatingDTO data)
     {
 
         _logger.LogDebug($"Attempting to retrieve data from body {data.Name} {data.Description}");
@@ -48,14 +48,8 @@ public class TodoItemController : ControllerBase
             }
             return TypedResults.BadRequest(ModelState);
         }
-
-
-        var item = new TodoItem()
-        {
-            Description = data.Description,
-            IsCompleted = data.IsCompleted,
-            Name = data.Name
-        };
+        
+        var item = _mapper.Map<TodoItem>(data);
 
         _logger.LogDebug("Attempting to retrieve current user from the repository");
 
@@ -67,16 +61,13 @@ public class TodoItemController : ControllerBase
             return TypedResults.NotFound();
         }
 
-        item.Id = Guid.NewGuid();
-        item.CreatedOn = DateTime.UtcNow;
-        item.LastModified = DateTime.UtcNow;
         item.UserId = current.Id;
         await _todoItemRepository.Create(item);
 
 
         _logger.LogDebug($"TodoItemDTO created - Name: {item.Name}, Description: {item.Description}, IsCompleted: {item.IsCompleted}");
 
-        return TypedResults.Created($"/item/{item.Id}");
+        return TypedResults.CreatedAtRoute("FindByCondition", new { id = item.Id });
     }
 
     [HttpGet("list")]

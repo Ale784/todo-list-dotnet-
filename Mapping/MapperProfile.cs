@@ -10,6 +10,10 @@ public class AutoMapperProfile : Profile {
         
         CreateMap<TodoItem, TodoItemDTO>();
 
+        CreateMap<TodoItemForCreatingDTO, TodoItem>()
+        .ForMember(todo => todo.CreatedOn, opt => opt.MapFrom(src => DateTime.UtcNow))
+        .ForMember(todo => todo.LastModified, opt => opt.MapFrom(src => DateTime.UtcNow));
+
     }
 
 }
